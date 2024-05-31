@@ -1,4 +1,7 @@
 from PIL import Image
+import cv2
+from torchvision import transforms
+import numpy as np
 
 """
 Función para convertir en imágenes cada una de las páginas del documento PDF con la entrada de datos
@@ -20,6 +23,22 @@ def binarize_image(image, threshold):
     image_result = image.convert('RGB')
     return image_result
 
+"""
+Transformación utilizada durante el entrenamiento de la red CNN
+"""
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.5,), (0.5,))
+])
+
+# Función para procesar la imagen
+def preprocess_imageCNN(image_pil):
+    input_image = np.array(image_pil)
+    image = cv2.resize(input_image, (252, 28))
+    image = Image.fromarray(image)
+    image = transform(image)
+    image = image.unsqueeze(0)  # Añadir una dimensión para el batch
+    return image
 
   
     

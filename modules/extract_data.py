@@ -1,20 +1,54 @@
 import torch
-from transformers import TrOCRProcessor, VisionEncoderDecoderModel, AutoModel, AutoProcessor
-from routes import trocr_model_path, signature_model_path
+from transformers import  AutoModel, AutoProcessor
+from routes import signature_model_path, cnn_model_path
+from modules.preprocess import preprocess_imageCNN
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
+
 """
-Carga del modelo preentrenado para la extracción de texto de una imagen, desde el almacenamiento local.
+Carga del modelo con las clases de la red CNN
 """
-processorTROCR = TrOCRProcessor.from_pretrained(trocr_model_path)
-modelTROCR = VisionEncoderDecoderModel.from_pretrained(trocr_model_path).to(device)
+model_cnn_ocr = torch.load(cnn_model_path).to(device)
 
 """
 Carga del modelo preentrenado para la clasificación de imágenes de firma, desde el almacenamiento local.
 """
 signature_proccessor = AutoProcessor.from_pretrained(signature_model_path)
 model_signature = AutoModel.from_pretrained(signature_model_path).to(device)
+
+"""
+Abecedario numerado a partir del 10 para A-Z para CNN
+"""
+abecedario_numerado = {
+    "A": 10,
+    "B": 11,
+    "C": 12,
+    "D": 13,
+    "E": 14,
+    "F": 15,
+    "G": 16,
+    "H": 17,
+    "I": 18,
+    "J": 19,
+    "K": 20,
+    "L": 21,
+    "M": 22,
+    "N": 23,
+    "O": 24,
+    "P": 25,
+    "Q": 26,
+    "R": 27,
+    "S": 28,
+    "T": 29,
+    "U": 30,
+    "V": 31,
+    "W": 32,
+    "X": 33,
+    "Y": 34,
+    "Z": 35
+}
 
 
 """
@@ -79,16 +113,34 @@ def detectSignature(image):
         return True
     return False
 
-    
-    
+"""
+Abecedario numerado a partir del 10 para A-Z para CNN invertido
+"""
+numerado_abecedario = {v: k for k, v in abecedario_numerado.items()}
+
+"""
+Función para convertir etiquetas numéricas a caracteres
+"""
+def labels_to_string(labels):
+    label_str = ''.join(str(l.item()) for l in labels[:-1])
+    label_str += numerado_abecedario[labels[-1].item()]
+    return label_str
+
 
 """
 Función encargada de extraer el DNI de una imagen, devolviendo el texto extraído.
 """
 def extractDNI(image):
     image = image.crop((0,13, image.width, image.height-15))
-    pixel_values = processorTROCR(image, return_tensors='pt').pixel_values.to(device)
-    generated_ids = modelTROCR.generate(pixel_values, max_new_tokens=9)
-    generated_text = processorTROCR.batch_decode(generated_ids, skip_special_tokens=True)[0]
-
+    image = image.convert('L')
+    input_image = preprocess_imageCNN(image)
+    input_image = input_image.to(device)
+    model_cnn_ocr.eval()
+    with torch.no_grad():
+        output = model_cnn_ocr(input_image)
+    print(output)
+    predicted_labels = torch.argmax(output, dim=2)
+    generated_text = labels_to_string(predicted_labels[0])
+    print('Predicción:', generated_text)
+    input("press")
     return generated_text

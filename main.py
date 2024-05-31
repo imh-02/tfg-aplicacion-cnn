@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import numpy as np
 import time
+from modules.cnn_model import CNNModel
+
 from modules.preprocess import convert_page_to_image
 from modules.table_features import cell_detection
 from modules.extract_data import getOrderedRow, getOrderedCol, processRow, extractDNI, detectSignature
@@ -12,7 +14,6 @@ import fitz
 
 from modules.metrics import Metrics, readTrueFile
 from routes import pdf_file_path, output_file, true_file_path
-
 
 """
 Objeto de la clase report que se encargará de almacenar los datos del análisis para el informe final
