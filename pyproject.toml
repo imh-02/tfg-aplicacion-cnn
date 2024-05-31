@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "tfg-aplicacion-cnn"
+version = "0.1.0"
+description = ""
+authors = ["Ismael Martín Herrera <alu0101397375@ull.edu.es>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+transformers = "4.38.1"
+fitz = "0.0.1.dev2"
+numpy = "^1.26.4"
+pillow = "^10.3.0"
+torch = {version = "^2.2.2+cu118", source = "pytorch_gpu"}
+torchvision = {version = "^0.17.2+cu118", source = "pytorch_gpu"}
+fpdf2 = "^2.7.8"
+scikit-learn = "^1.4.2"
+pymupdf = "^1.24.2"
+jiwer = "^3.0.4"
+sentencepiece = "^0.2.0"
+protobuf = "^5.27.0"
+opencv-python-headless = "^4.9.0.80"
+datasets = "^2.19.1"
+
+[[tool.poetry.source]]
+name = "pytorch_gpu"
+url = "https://download.pytorch.org/whl/cu118"
+priority = "explicit"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
