@@ -18,7 +18,7 @@ datasetPathRoot = "datasetDNI"
 """
 Ruta del directorio donde se va a guardar el modelo entrenado
 """
-modelResultPathRoot = "cnn_ocr_5000.pth"
+modelResultPathRoot = "cnn_ocr_1000.pth"
 
 """
 Abecedario numerdado del a partir del 10 para A-Z
@@ -97,7 +97,7 @@ class CNNModel(nn.Module):
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
         self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
         self.fc1 = nn.Linear(128 * 31 * 3, 256)
-        self.fc2 = nn.Linear(256, 9)
+        self.fc2 = nn.Linear(256, 9*36)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
@@ -106,9 +106,9 @@ class CNNModel(nn.Module):
         x = x.view(-1, 128 * 31 * 3)
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
+        x = x.view(-1, 9, 36)  # Reshape a [batch_size, 9, 36]
         return x
 
-model = CNNModel().to(device)
 
 
 # Cargar el dataset utilizando la estructura de directorios
@@ -122,6 +122,8 @@ transform = transforms.Compose([
 
 dataset = DNIDataset(dataset['train'], datasetPathRoot, transform=transform)
 dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+
+model = CNNModel().to(device)
 
 print('Start Training')
 
@@ -140,9 +142,13 @@ for epoch in range(20):
         inputs, labels = inputs.to(device), labels.to(device)  # Mover los datos a la GPU
         optimizer.zero_grad()
         outputs = model(inputs)
+
+        labels = labels.view(-1)
         
         # Asegúrate de que las etiquetas estén en el rango correcto
-        labels_clipped = torch.clamp(labels, 0, num_classes - 1).float()
+        labels_clipped = torch.clamp(labels, 0, num_classes - 1).long()
+
+        outputs = outputs.view(-1, num_classes)
         
         loss = criterion(outputs, labels_clipped)
         
@@ -192,7 +198,7 @@ def labels_to_string(labels):
     return label_str
 
 # Ruta de la imagen a predecir
-image_path = 'datasetDNI\\84935341K.png'
+image_path = 'ejemplo2.png'
 
 # Procesar la imagen
 input_image = preprocess_image(image_path)
@@ -204,16 +210,12 @@ input_image = input_image.to(device)
 with torch.no_grad():
     output = model(input_image)
 
-# Mover la salida del modelo a la CPU
-output = output.cpu()
+print(output[0].argmax(1))
 
-# Convertir la salida del modelo a etiquetas
-predicted_labels = output.argmax(dim=2).squeeze()
+print('Predicción:', labels_to_string(output[0].argmax(1)))
 
-# Convertir las etiquetas numéricas a cadena
-predicted_string = labels_to_string(predicted_labels)
 
-print('Predicted DNI:', predicted_string)
+
 
 
 
