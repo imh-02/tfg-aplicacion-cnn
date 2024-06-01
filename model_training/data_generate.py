@@ -5,12 +5,12 @@ import os
 """
 Variables para especificar el número de imágenes que se van a generar
 """
-number_of_images = 1000
+number_of_images = 40000
 
 """
 Ruta donde se va a guardar el dataset generado
 """
-datasetPathRoot = "datasetDNI"
+datasetPathRoot = "datasetDNI95x20_40000"
 
 """
 Ruta del dataset origen de las imágenes de los dígitos y letras
@@ -60,7 +60,9 @@ def generateDataset():
             numbersPixels = []
 
             for k in imagesDir:
-                numbersPixels.append(np.array(Image.open(k)))
+                img = Image.open(k)
+                img_resized = img.resize((11, 20))  # Cambiar el tamaño de la imagen a 25x25
+                numbersPixels.append(np.array(img_resized))
 
             randomNumberPosition = np.random.randint(0, len(numbersPixels))
             generatedNumbers.append(numbersPixels[randomNumberPosition])
@@ -69,15 +71,17 @@ def generateDataset():
         lettersImagesDirPath = originDatasetPathRootLetters + letters_dic[dniLetter].upper() + "\\"
         imagesDir = obteinRoutes(lettersImagesDirPath)
         for k in imagesDir:
-            lettersPixels.append(np.array(Image.open(k)))
+            img = Image.open(k)
+            img_resized = img.resize((11, 20))  # Cambiar el tamaño de la imagen a 25x25
+            lettersPixels.append(np.array(img_resized))
         
         for j in range(len(generatedNumbers)):
-            generatedNumbers[j].shape = (28, 28)
+            generatedNumbers[j] = generatedNumbers[j]
         
         
         randomLetterPosition = np.random.randint(0, len(lettersPixels))
         letter = lettersPixels[randomLetterPosition]
-        letter.shape = (28, 28)
+        # letter.shape = (25, 25)
         combined_array = np.hstack((generatedNumbers[0], generatedNumbers[1], generatedNumbers[2], generatedNumbers[3], 
                                                   generatedNumbers[4], generatedNumbers[5], 
                                                   generatedNumbers[6], generatedNumbers[7], 

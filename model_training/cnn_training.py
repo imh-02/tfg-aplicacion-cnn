@@ -5,20 +5,21 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 import cv2
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps
 import os
 from datasets import load_dataset
 import torch.nn.functional as F
+from sklearn.model_selection import KFold
 
 """
 Ruta del dataset de entrenamiento
 """
-datasetPathRoot = "datasetDNI"
+datasetPathRoot = "datasets_generated\\datasetDNI95x20_10000"
 
 """
 Ruta del directorio donde se va a guardar el modelo entrenado
 """
-modelResultPathRoot = "cnn_ocr_1000_completo.pth"
+modelResultPathRoot = "cnn_ocr_1000_completo95x20_10000-aug.pth"
 
 """
 Abecedario numerdado del a partir del 10 para A-Z
@@ -76,8 +77,9 @@ class DNIDataset(Dataset):
 
 
         image = cv2.imread(self.dirPaths[idx], cv2.IMREAD_GRAYSCALE)
-        image = cv2.resize(image, (252, 28))
+        #image = cv2.resize(image, (95, 20))
         image = Image.fromarray(image)
+        image = ImageOps.pad(image, (95, 20), method=Image.BICUBIC)
 
         if self.transform:
             image = self.transform(image)
@@ -96,17 +98,19 @@ class CNNModel(nn.Module):
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
         self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
-        self.fc1 = nn.Linear(128 * 31 * 3, 256)
-        self.fc2 = nn.Linear(256, 9*36)
+        self.fc1 = nn.Linear(128 * 11 * 2, 256)  # Ajuste del tamaño de la capa lineal
+        self.dropout = nn.Dropout(p=0.5)
+        self.fc2 = nn.Linear(256, 9 * 36)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
         x = self.pool(F.relu(self.conv3(x)))
-        x = x.view(-1, 128 * 31 * 3)
+        x = x.view(-1, 128 * 11 * 2)  # Ajuste del tamaño de la vista
         x = F.relu(self.fc1(x))
+        x = self.dropout(x)
         x = self.fc2(x)
-        x = x.view(-1, 9, 36)  # Reshape a [batch_size, 9, 36]
+        x = x.view(-1, 9, 36)
         return x
 
 
@@ -115,7 +119,13 @@ class CNNModel(nn.Module):
 dataset = load_dataset("imagefolder", data_dir=datasetPathRoot)
 
 # Definir las transformaciones
+# transform = transforms.Compose([
+#     transforms.ToTensor(),
+#     transforms.Normalize((0.5,), (0.5,))
+# ])
+
 transform = transforms.Compose([
+    transforms.RandomAffine(degrees=5, translate=(0.1, 0.1), scale=(0.9, 1.1), shear=5),  # Añadir augmentación
     transforms.ToTensor(),
     transforms.Normalize((0.5,), (0.5,))
 ])
@@ -164,55 +174,7 @@ print('Finished Training')
 
 torch.save(model, modelResultPathRoot)
 
-# # Cargar los pesos entrenados
-# model.load_state_dict(torch.load(modelResultPathRoot))
 
-# # Configurar el modelo en modo evaluación
-# model.eval()
-
-# # Mover el modelo a la GPU si está disponible
-# model = model.to(device)
-
-# # Transformación utilizada durante el entrenamiento
-# transform = transforms.Compose([
-#     transforms.ToTensor(),
-#     transforms.Normalize((0.5,), (0.5,))
-# ])
-
-# # Función para procesar la imagen
-# def preprocess_image(image_path):
-#     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-#     image = cv2.resize(image, (252, 28))
-#     image = Image.fromarray(image)
-#     image = transform(image)
-#     image = image.unsqueeze(0)  # Añadir una dimensión para el batch
-#     return image
-
-# # Invertir el diccionario de abecedario numerado para convertir números a letras
-# numerado_abecedario = {v: k for k, v in abecedario_numerado.items()}
-
-# # Función para convertir etiquetas numéricas a caracteres
-# def labels_to_string(labels):
-#     label_str = ''.join(str(l.item()) for l in labels[:-1])
-#     label_str += numerado_abecedario[labels[-1].item()]
-#     return label_str
-
-# # Ruta de la imagen a predecir
-# image_path = 'ejemplo2.png'
-
-# # Procesar la imagen
-# input_image = preprocess_image(image_path)
-
-# # Mover la imagen a la GPU si está disponible
-# input_image = input_image.to(device)
-
-# # Realizar la predicción
-# with torch.no_grad():
-#     output = model(input_image)
-
-# print(output[0].argmax(1))
-
-# print('Predicción:', labels_to_string(output[0].argmax(1)))
 
 
 
