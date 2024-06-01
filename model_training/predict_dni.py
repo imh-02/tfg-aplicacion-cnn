@@ -1,13 +1,8 @@
 import torch
 import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 import cv2
-import numpy as np
 from PIL import Image
-import os
-from datasets import load_dataset
 import torch.nn.functional as F
 
 class CNNModel(nn.Module):
@@ -17,17 +12,17 @@ class CNNModel(nn.Module):
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
         self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
-        self.fc1 = nn.Linear(128 * 31 * 3, 256)
-        self.fc2 = nn.Linear(256, 9*36)
+        self.fc1 = nn.Linear(128 * 11 * 2, 256)  # Ajuste del tamaño de la capa lineal
+        self.fc2 = nn.Linear(256, 9 * 36)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
         x = self.pool(F.relu(self.conv3(x)))
-        x = x.view(-1, 128 * 31 * 3)
+        x = x.view(-1, 128 * 11 * 2)  # Ajuste del tamaño de la vista
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
-        x = x.view(-1, 9, 36)  # Reshape a [batch_size, 9, 36]
+        x = x.view(-1, 9, 36)
         return x
 
 """
@@ -38,7 +33,7 @@ datasetPathRoot = "datasetDNI"
 """
 Ruta del directorio donde se va a guardar el modelo entrenado
 """
-modelResultPathRoot = "cnn_ocr_1000_completo.pth"
+modelResultPathRoot = "cnn_ocr_1000_completo95x20.pth"
 
 """
 Abecedario numerdado del a partir del 10 para A-Z
@@ -84,8 +79,10 @@ transform = transforms.Compose([
 # Función para procesar la imagen
 def preprocess_image(image_path):
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    image = cv2.resize(image, (252, 28))
+    image = cv2.resize(image, (95,20))
     image = Image.fromarray(image)
+    # image.show()
+    # input("press")
     image = transform(image)
     image = image.unsqueeze(0)  # Añadir una dimensión para el batch
     return image
@@ -100,7 +97,7 @@ def labels_to_string(labels):
     return label_str
 
 # Ruta de la imagen a predecir
-image_path = 'ejemplo.png'
+image_path = 'temp3.png'
 
 # Procesar la imagen
 input_image = preprocess_image(image_path)
