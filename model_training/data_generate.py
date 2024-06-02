@@ -5,7 +5,7 @@ import os
 """
 Variables para especificar el número de imágenes que se van a generar
 """
-number_of_images = 40000
+number_of_images = 20000
 
 """
 Ruta donde se va a guardar el dataset generado

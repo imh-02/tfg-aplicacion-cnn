@@ -131,17 +131,22 @@ def labels_to_string(labels):
 Función encargada de extraer el DNI de una imagen, devolviendo el texto extraído.
 """
 def extractDNI(image):
-    # image = image.crop((10,18, image.width-5, image.height-15))
-    #image = image.convert('L')
+    image = image.crop((8,15, image.width-4, image.height-15))
+    #
+    # image = image.convert('L')
     # image.show()
     # input("recorte")
+    # image.show()
+    # input("press")
     input_image = preprocess_imageCNN(image)
+
     input_image = input_image.to(device)
     model_cnn_ocr.eval()
     with torch.no_grad():
         output = model_cnn_ocr(input_image)
-    predicted_labels = torch.argmax(output, dim=2)
-    generated_text = labels_to_string(predicted_labels[0])
-    print('Predicción:', generated_text)
-    input("press")
+
+    predicted = torch.argmax(output, dim=2).squeeze(0)
+    generated_text = labels_to_string(predicted)
+    # print('Predicción:', generated_text)
+    # input("press")
     return generated_text

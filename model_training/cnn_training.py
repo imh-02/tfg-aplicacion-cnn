@@ -9,17 +9,16 @@ from PIL import Image, ImageOps
 import os
 from datasets import load_dataset
 import torch.nn.functional as F
-from sklearn.model_selection import KFold
 
 """
 Ruta del dataset de entrenamiento
 """
-datasetPathRoot = "datasets_generated\\datasetDNI95x20_10000"
+datasetPathRoot = "datasets_generated\\datasetDNI95x20_54000"
 
 """
 Ruta del directorio donde se va a guardar el modelo entrenado
 """
-modelResultPathRoot = "cnn_ocr_1000_completo95x20_10000-aug.pth"
+modelResultPathRoot = "models\\cnn_ocr_54.000_95x20.pth"
 
 """
 Abecedario numerdado del a partir del 10 para A-Z
@@ -76,10 +75,28 @@ class DNIDataset(Dataset):
         label = fileName
 
 
-        image = cv2.imread(self.dirPaths[idx], cv2.IMREAD_GRAYSCALE)
-        #image = cv2.resize(image, (95, 20))
-        image = Image.fromarray(image)
-        image = ImageOps.pad(image, (95, 20), method=Image.BICUBIC)
+        #image = cv2.imread(self.dirPaths[idx], cv2.IMREAD_GRAYSCALE)
+        image = Image.open(self.dirPaths[idx])
+        # heigth = image.size[1]
+        # image = ImageOps.pad(image, (90, heigth), color='white')
+        # # image.show()
+        # # input("press")
+        # image = ImageOps.pad(image, (95, 20), color='white')
+
+        image_np = np.array(image)
+
+        image_np = cv2.resize(image_np, (95, 20))
+
+        # # # # Convertir la imagen a escala de grises
+        # gray = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
+
+        # # # # Aplicar umbral para obtener una imagen binaria
+        # _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY)
+
+        image = Image.fromarray(image_np)
+
+        # image.show()
+        # input("press")
 
         if self.transform:
             image = self.transform(image)
@@ -98,19 +115,17 @@ class CNNModel(nn.Module):
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
         self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
-        self.fc1 = nn.Linear(128 * 11 * 2, 256)  # Ajuste del tamaño de la capa lineal
-        self.dropout = nn.Dropout(p=0.5)
-        self.fc2 = nn.Linear(256, 9 * 36)
+        self.fc1 = nn.Linear(128 * 11 * 2, 256)
+        self.fc2 = nn.Linear(256, 9*36)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
         x = self.pool(F.relu(self.conv3(x)))
-        x = x.view(-1, 128 * 11 * 2)  # Ajuste del tamaño de la vista
+        x = x.view(-1, 128 * 11 * 2)
         x = F.relu(self.fc1(x))
-        x = self.dropout(x)
         x = self.fc2(x)
-        x = x.view(-1, 9, 36)
+        x = x.view(-1, 9, 36)  # Reshape a [batch_size, 9, 36]
         return x
 
 
@@ -119,13 +134,7 @@ class CNNModel(nn.Module):
 dataset = load_dataset("imagefolder", data_dir=datasetPathRoot)
 
 # Definir las transformaciones
-# transform = transforms.Compose([
-#     transforms.ToTensor(),
-#     transforms.Normalize((0.5,), (0.5,))
-# ])
-
 transform = transforms.Compose([
-    transforms.RandomAffine(degrees=5, translate=(0.1, 0.1), scale=(0.9, 1.1), shear=5),  # Añadir augmentación
     transforms.ToTensor(),
     transforms.Normalize((0.5,), (0.5,))
 ])
