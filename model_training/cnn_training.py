@@ -18,7 +18,7 @@ datasetPathRoot = "datasets_generated\\datasetDNI95x20_54000"
 """
 Ruta del directorio donde se va a guardar el modelo entrenado
 """
-modelResultPathRoot = "models\\cnn_ocr_54.000_95x20.pth"
+modelResultPathRoot = "models\\cnn_ocr_54.000_95x20Binary60Epocas.pth"
 
 """
 Abecedario numerdado del a partir del 10 para A-Z
@@ -83,17 +83,17 @@ class DNIDataset(Dataset):
         # # input("press")
         # image = ImageOps.pad(image, (95, 20), color='white')
 
-        image_np = np.array(image)
+        image_np = np.array(image.convert('RGB'))
 
         image_np = cv2.resize(image_np, (95, 20))
 
-        # # # # Convertir la imagen a escala de grises
-        # gray = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
+        # # # Convertir la imagen a escala de grises
+        gray = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
 
-        # # # # Aplicar umbral para obtener una imagen binaria
-        # _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY)
+        # # # Aplicar umbral para obtener una imagen binaria
+        _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY)
 
-        image = Image.fromarray(image_np)
+        image = Image.fromarray(binary)
 
         # image.show()
         # input("press")
@@ -154,7 +154,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 num_classes = 36
 
 # Dentro del bucle de entrenamiento
-for epoch in range(20):
+for epoch in range(61):
     running_loss = 0.0
     for i, data in enumerate(dataloader, 0):
         inputs, labels = data

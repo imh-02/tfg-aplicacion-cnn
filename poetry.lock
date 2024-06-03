@@ -457,6 +457,25 @@ graph = ["objgraph (>=1.7.2)"]
 profile = ["gprof2dot (>=2022.7.29)"]
 
 [[package]]
+name = "emnist"
+version = "0.0"
+description = "Extended MNIST - Python Package"
+optional = false
+python-versions = ">=3.0"
+files = [
+    {file = "emnist-0.0-py3-none-any.whl", hash = "sha256:80a3d062aab1f28fc48c895017051d44b3ae17e5bfc4040660714e9b0682d8fc"},
+    {file = "emnist-0.0.tar.gz", hash = "sha256:755fcc4b63ed12740a9842fa9e8b22e4df019fc2d11b1f4bd0495fd56613ef5e"},
+]
+
+[package.dependencies]
+numpy = "*"
+requests = "*"
+tqdm = "*"
+
+[package.extras]
+inspect = ["matplotlib"]
+
+[[package]]
 name = "etelemetry"
 version = "0.3.1"
 description = "Etelemetry python client API"
@@ -3378,4 +3397,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "ec8af914027596073de7f2631c18442643f41bf76d35efdefcc0bf4e471fc4cd"
+content-hash = "1c7f8d17c02a0ced38e17d5d8ef13a0b58df57380a3609758f55cd124b47b63a"

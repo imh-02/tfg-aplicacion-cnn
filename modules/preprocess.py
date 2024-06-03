@@ -79,11 +79,11 @@ def preprocess_imageCNN(image_pil):
     input_image = np.array(image_pil)
 
     input_image = cv2.resize(input_image, (95, 20))
-    # # # # Convertir la imagen a escala de grises
-    # gray = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
+    # # # Convertir la imagen a escala de grises
+    gray = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
 
-    # # # Aplicar umbral para obtener una imagen binaria
-    # _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY)
+    # # Aplicar umbral para obtener una imagen binaria
+    _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY)
 
     # binary = cv2.bitwise_not(binary)
 
@@ -92,7 +92,7 @@ def preprocess_imageCNN(image_pil):
 
     # not_image_dilation = cv2.bitwise_not(image_dilation)
 
-    image = Image.fromarray(input_image)
+    image = Image.fromarray(binary)
 
     image = image.convert('L')
 

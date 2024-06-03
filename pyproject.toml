@@ -22,6 +22,7 @@ protobuf = "^5.27.0"
 opencv-python-headless = "^4.9.0.80"
 datasets = "^2.19.1"
 matplotlib = "^3.9.0"
+emnist = "^0.0"
 
 [[tool.poetry.source]]
 name = "pytorch_gpu"
