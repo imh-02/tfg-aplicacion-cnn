@@ -1,3 +1,10 @@
 models
 models.zip
-model_training
+model_training/**/datasets_generated
+model_training/**/models
+model_training/**/datasetsave4
+model_training/**/datasetsave12
+model_training/**/datasetsave12_junto
+model_training/**/img_examples
+
+
