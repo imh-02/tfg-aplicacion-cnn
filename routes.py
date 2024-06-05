@@ -26,6 +26,6 @@ use_2_models = True
 """
 Rutas ficheros de entrada y salida
 """
-pdf_file_path = "ejemplos\\ejemplo1PS.pdf"
-output_file = "informe1PS_PRUEBA_MNIST_Tutorial9"
+pdf_file_path = "ejemplos\\ejemplo10PS.pdf"
+output_file = "informe10PS"
 true_file_path = "datos_reales\\ejemplo1PS.txt"
