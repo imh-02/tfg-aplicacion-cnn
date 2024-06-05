@@ -6,5 +6,7 @@ model_training/**/datasetsave4
 model_training/**/datasetsave12
 model_training/**/datasetsave12_junto
 model_training/**/img_examples
+model_training/**/data
+model_training/**/scripts_prueba
 
 

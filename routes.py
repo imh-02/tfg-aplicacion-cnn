@@ -6,9 +6,12 @@ signature_model_path = "models\\siglip-base-patch16-256-multilingual"
 table_model_path = "models\\table-transformer-structure-recognition"
 
 """
-Ruta de la red CNN que se usa en el análisis
+Ruta de las dos redes CNN separadas para caracteres individuales
 """
-cnn_model_path = "models\\cnn_ocr_54.000_95x20Binary60Epocas.pth"
+cnn_letters_model_path = "model_training\\cnn_emnist_letters_tutorial40Epochs.pth"
+cnn_numbers_model_path = "models\\cnn_mnist_tutorial.pth"
+
+
 
 """
 Ruta de la carpeta donde se guardarán los informes
@@ -16,8 +19,13 @@ Ruta de la carpeta donde se guardarán los informes
 reports_path_root = "reports\\"
 
 """
+Flag para indicar si usar dos modeles de caracteres individuales o uno
+"""
+use_2_models = True
+
+"""
 Rutas ficheros de entrada y salida
 """
-pdf_file_path = "ejemplos\\ejemplo1000PS.pdf"
-output_file = "informe1000PS-cnn54.000_95x20Binary60Epocas256Batch"
-true_file_path = "datos_reales\\ejemplo1000PS.txt"
+pdf_file_path = "ejemplos\\ejemplo1PS.pdf"
+output_file = "informe1PS_PRUEBA_MNIST_Tutorial9"
+true_file_path = "datos_reales\\ejemplo1PS.txt"

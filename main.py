@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 import time
-from modules.cnn_model import CNNModel
+from modules.cnn_model import CNNModel, NeuralNetwork, CNN, CNN_letters
 
 from modules.preprocess import convert_page_to_image
 from modules.table_features import cell_detection
