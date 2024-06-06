@@ -11,17 +11,10 @@ Ruta de las dos redes CNN separadas para caracteres individuales
 cnn_letters_model_path = "models\\cnn_emnist_letters_tutorial70Epochs.pth"
 cnn_numbers_model_path = "models\\cnn_mnist_tutorial.pth"
 
-
-
 """
 Ruta de la carpeta donde se guardarán los informes
 """
 reports_path_root = "reports\\"
-
-"""
-Flag para indicar si usar dos modeles de caracteres individuales o uno
-"""
-use_2_models = True
 
 """
 Rutas ficheros de entrada y salida
