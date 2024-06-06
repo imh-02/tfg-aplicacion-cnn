@@ -6,14 +6,9 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torch
 
-transform = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize((0.5,), (0.5,))  # Normalize to [0,1]
-])
+train_data = datasets.MNIST(root = "data", train = True, download = True, transform = ToTensor())
 
-train_data = datasets.MNIST(root = "data", train = True, download = True, transform = transform)
-
-test_data = datasets.MNIST(root = "data", train = False, download = True, transform = transform)
+test_data = datasets.MNIST(root = "data", train = False, download = True, transform = ToTensor())
 
 
 loaders = {
@@ -78,8 +73,8 @@ def test():
     test_loss /= len(loaders['test'].dataset)
     print(f'\nTest set: Average loss: {test_loss:.4f}, Accuracy: {correct}/{len(loaders["test"].dataset)} ({100. * correct / len(loaders["test"].dataset):.0f}%)\n')
 
-for epoch in range(1, 21):
+for epoch in range(1, 91):
     train(epoch)
     test()
 
-torch.save(model, "cnn_mnist_tutorial_20epochsNormalized.pth")
+torch.save(model, "cnn_mnist_tutorial_90epochs.pth")

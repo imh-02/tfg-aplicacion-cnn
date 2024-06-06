@@ -7,19 +7,15 @@ import torch.optim as optim
 import torch
 
 
-transform = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize((0.5,), (0.5,))  # Normalize to [0,1]
-])
 
-train_data = datasets.EMNIST(root = "data", train = True, download = True, transform = transform, split = "letters")
+train_data = datasets.EMNIST(root="data", train=True, download=True, transform=ToTensor(), split="letters")
 
-test_data = datasets.EMNIST(root = "data", train = False, download = True, transform = transform, split = "letters")
+test_data = datasets.EMNIST(root="data", train=False, download=True, transform=ToTensor(), split="letters")
 
 
 loaders = {
-    "train": DataLoader(train_data, batch_size = 100, shuffle = True),
-    "test": DataLoader(test_data, batch_size = 100, shuffle = True)
+    "train": DataLoader(train_data, batch_size = 32, shuffle = True),
+    "test": DataLoader(test_data, batch_size = 32, shuffle = True)
 }
 
 class CNN_letters(nn.Module):
@@ -79,8 +75,8 @@ def test():
     test_loss /= len(loaders['test'].dataset)
     print(f'\nTest set: Average loss: {test_loss:.4f}, Accuracy: {correct}/{len(loaders["test"].dataset)} ({100. * correct / len(loaders["test"].dataset):.0f}%)\n')
 
-for epoch in range(1, 21):
+for epoch in range(1, 91):
     train(epoch)
     test()
 
-torch.save(model, "cnn_emnist_letters_tutorial21EpochsNormalizadas.pth")
+torch.save(model, "cnn_emnist_letters_tutorial90Epochs.pth")

@@ -1,7 +1,8 @@
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageFilter
 import cv2
 from torchvision import transforms
 import numpy as np
+import statistics
 
 """
 Función para convertir en imágenes cada una de las páginas del documento PDF con la entrada de datos
@@ -24,17 +25,27 @@ def binarize_image(image, threshold):
     return image_result
 
 def preprocess_CNN(image):
+    heigth = image.size[1]
+    width = image.size[0]
+
+    image = ImageOps.pad(image, (width,heigth + 4), color='white')
+    image = ImageOps.pad(image, (width + 4,heigth + 4), color='white')
+    image = ImageOps.pad(image, (128,128), color='white')
+    image = image.point(lambda p: p > 200 and 255)
+    image_np = np.array(image)
+    image_np = cv2.bitwise_not(image_np)
+    image = Image.fromarray(image_np)
+
+    image = image.filter(ImageFilter.GaussianBlur(radius=1))
+
+    image = image.resize((28,28), Image.BICUBIC)
     image = image.convert('L')
-    
-    image = ImageOps.pad(image, (7,22), color='white')
-    image = ImageOps.pad(image, (28,28), color='white')
 
-    image = image.point(lambda p: p > 190 and 255)
-
-    image = Image.eval(image, lambda p: 255 - p)
+    image_preprocessed = image
 
     transform = transforms.Compose([transforms.ToTensor()])
     image_preprocessed = transform(image)
+
     return image_preprocessed
 
 

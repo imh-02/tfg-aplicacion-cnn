@@ -41,13 +41,15 @@ letters_dict = {
         16: 'P', 
         17: 'Q', 
         18: 'R', 
-        19: 'S', 
-        20: 'U', 
-        21: 'V', 
-        22: 'W', 
-        23: 'X', 
-        24: 'Y', 
-        25: 'Z'}
+        19: 'S',
+        20: 'T',
+        21: 'U',
+        22: 'V',
+        23: 'W',
+        24: 'X',
+        25: 'Y',
+        26: 'Z'
+        }
 
 
 """
@@ -153,7 +155,7 @@ def cropCharacters(image):
     characters_pil = []
     for box in bounding_boxes:
         x1, y1, x2, y2 = box
-        character = image.crop((x1, y1, x2, y2))
+        character = image.crop((x1-1, y1-1, x2+1, y2+1))
         characters_pil.append(character)
 
     return characters_pil

@@ -8,7 +8,7 @@ table_model_path = "models\\table-transformer-structure-recognition"
 """
 Ruta de las dos redes CNN separadas para caracteres individuales
 """
-cnn_letters_model_path = "model_training\\cnn_emnist_letters_tutorial40Epochs.pth"
+cnn_letters_model_path = "models\\cnn_emnist_letters_tutorial70Epochs.pth"
 cnn_numbers_model_path = "models\\cnn_mnist_tutorial.pth"
 
 
@@ -26,6 +26,6 @@ use_2_models = True
 """
 Rutas ficheros de entrada y salida
 """
-pdf_file_path = "ejemplos\\ejemplo10PS.pdf"
-output_file = "informe10PS"
+pdf_file_path = "ejemplos\\ejemplo1PS.pdf"
+output_file = "informe1PS"
 true_file_path = "datos_reales\\ejemplo1PS.txt"
