@@ -2,7 +2,6 @@ from PIL import Image, ImageOps, ImageFilter
 import cv2
 from torchvision import transforms
 import numpy as np
-import statistics
 
 """
 Función para convertir en imágenes cada una de las páginas del documento PDF con la entrada de datos
