@@ -1,7 +1,6 @@
 """
 Nombres o rutas de los modelos de transformers que se usan en el análisis
 """
-trocr_model_path = "models\\trocr_finetuned_modelCompleteDNI_135_local"
 signature_model_path = "models\\siglip-base-patch16-256-multilingual"
 table_model_path = "models\\table-transformer-structure-recognition"
 
