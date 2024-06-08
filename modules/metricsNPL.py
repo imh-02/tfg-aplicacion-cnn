@@ -30,74 +30,45 @@ class MetricsNPL:
         self.total_number_of_dni = total_number_of_dni
 
     """
-    Función para calcular los parámetros necesarios para las métricas NPL 
+    Función para calcular los parámetros necesarios para las métricas NPL haciendo uso del algoritmo de distancia de edición (Levenshtein).
     TP: True Positives - caracteres correctamente reconocidos
     FP: False Positives - caracteres reconocidos incorrectamente (porque se han añadido caracteres de más)
     FN: False Negatives - caracteres no reconocidos
     """
     def get_metrics_params(self, true_dni, pred_dni):
-        dni = list(true_dni)
-        pred = list(pred_dni)
-
-        print("DNI real: ", dni)
-        print("DNI predicho: ", pred)
-
-        tp = 0
-        fp = 0
-        fn = 0
-
-        if len(dni) == len(pred):
-            for i in range(len(dni)):
-                if dni[i] == pred[i]:
-                    tp += 1
+        m = len(true_dni)
+        n = len(pred_dni)
+        ground_truth = list(true_dni)
+        predictions = list(pred_dni)
+        
+        # Crear una matriz para almacenar las operaciones de edición
+        dp = [[0] * (n + 1) for _ in range(m + 1)]
+        
+        # Llenar la primera fila y columna
+        for i in range(m + 1):
+            dp[i][0] = i
+        for j in range(n + 1):
+            dp[0][j] = j
+        
+        # Calcular el número mínimo de operaciones de edición
+        for i in range(1, m + 1):
+            for j in range(1, n + 1):
+                if ground_truth[i - 1] == predictions[j - 1]:
+                    dp[i][j] = dp[i - 1][j - 1]
                 else:
-                    fp += 1
-                
-        elif len(pred) < len(dni): # El DNI predicho es más corto que el real
-            pred_index = 0
-            true_index = 0
-            for i in range(len(pred)):
-                if pred[pred_index] == dni[true_index]:
-                    tp += 1
-                    true_index += 1
-                    pred_index += 1
-                else:
-                    print("Pred_index: ", pred_index)
-                    print("True_index + 1: ", true_index + 1)
-                    if true_index + 1 < len(dni):
-                        if pred[pred_index] == dni[true_index + 1]:
-                            fn += 1
-                            tp += 1
-                            true_index += 2
-                            pred_index += 1
-                        else:
-                            true_index += 1
-                            pred_index += 1
-                            fn += 1
-                    else: # si ya no hay más caracteres en el DNI real que comparar y no coincide con el predicho es una sustitución
-                        fp += 1
+                    dp[i][j] = 1 + min(dp[i - 1][j],        # Eliminación
+                                    dp[i][j - 1],        # Inserción
+                                    dp[i - 1][j - 1])   # Sustitución
+        
+        # El valor en la esquina inferior derecha de la matriz es la distancia de edición
+        edit_distance = dp[m][n]
+        insertions = max(n - m, 0)
+        deletions = max(m - n, 0)
 
-        else: # El DNI predicho es más largo que el real
-            pred_index = 0
-            true_index = 0
-            for i in range(len(dni)):
-                if dni[true_index] == pred[pred_index]:
-                    tp += 1
-                    true_index += 1
-                    pred_index += 1
-                else:
-                    if pred_index + 1 < len(pred):
-                        if dni[true_index] == pred[pred_index + 1]:
-                            fp += 1
-                            tp += 1
-                            true_index += 1
-                            pred_index += 2
-                        else: 
-                            true_index += 1
-                            pred_index += 1
-                            fp += 1
-                    else: # si ya no hay más caracteres en el DNI predicho que comparar y no coincide con el real es una eliminación
-                        fn += 1
+        tp = m - edit_distance
+        fp = insertions
+        fn = deletions
+
         return tp, fp, fn
 
     """
