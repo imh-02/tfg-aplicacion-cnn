@@ -1,4 +1,3 @@
-import sklearn.metrics as metrics
 from jiwer import wer, cer
 
 

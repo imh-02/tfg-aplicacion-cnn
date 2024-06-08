@@ -14,7 +14,6 @@ pillow = "^10.3.0"
 torch = {version = "^2.2.2+cu118", source = "pytorch_gpu"}
 torchvision = {version = "^0.17.2+cu118", source = "pytorch_gpu"}
 fpdf2 = "^2.7.8"
-scikit-learn = "^1.4.2"
 pymupdf = "^1.24.2"
 jiwer = "^3.0.4"
 sentencepiece = "^0.2.0"
