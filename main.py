@@ -12,7 +12,8 @@ from report_module.sign import Sign
 from report_module.report_pdf import reportPDF
 import fitz
 
-from modules.metrics import Metrics, readTrueFile
+from modules.metricsNPL import MetricsNPL, readTrueFile
+from modules.metricsML import MetricsML
 from routes import pdf_file_path, output_file, true_file_path
 
 """
@@ -32,7 +33,8 @@ def main():
         print("El número de DNI reales no coincide con el número de DNI que debería haber en el documento.")
         return
 
-    metrics = Metrics(trueDNIArray, len(trueDNIArray))
+    metricsNPL = MetricsNPL(trueDNIArray, len(trueDNIArray))
+    metricsML = MetricsML(trueDNIArray, len(trueDNIArray))
 
     print("Analizando...")
 
@@ -63,8 +65,10 @@ def main():
             for i in range(true_dni_index, true_dni_index + 10):
                 # Extraer DNI real y eliminarlo del array
                 trueDNIArray.pop(true_dni_index)
-                metrics.total_number_of_dni -= 1
-            metrics.y_true = trueDNIArray
+                metricsNPL.total_number_of_dni -= 1
+                metricsML.total_number_of_dni -= 1
+            metricsNPL.y_true = trueDNIArray
+            metricsML.y_true = trueDNIArray
         else:
 
             for i in range(1, 11):
@@ -100,20 +104,23 @@ def main():
                 final_report.number_dni_analyzed += 1
 
                 # Métricas antes del postprocesado
-                metrics.addPredictionBeforePostProcessed(extracted_dni)
+                metricsNPL.addPredictionBeforePostProcessed(extracted_dni)
+                metricsML.addPredictionBeforePostProcessed(extracted_dni)
 
                 #Procesado del DNI
                 formated_dni = formatDNI(extracted_dni)
 
                 # Métricas después de eliminar caracteres especiales
-                metrics.addPredictionDeletingSpecialChars(formated_dni)
+                metricsNPL.addPredictionDeletingSpecialChars(formated_dni)
+                metricsML.addPredictionDeletingSpecialChars(formated_dni)
 
                 formated_dni = fixPredictionErrorsDNI(formated_dni)
 
                 newSign.dni = formated_dni
 
                 # Métricas después del postprocesado
-                metrics.addPredictionPostProcessed(formated_dni)              
+                metricsNPL.addPredictionPostProcessed(formated_dni)     
+                metricsML.addPredictionPostProcessed(formated_dni)          
 
                 if checkDNIFormat(formated_dni):
                     newSign.dniFormat = True
@@ -157,7 +164,7 @@ def main():
 
 
 
-    final_report.metrics = metrics.get_metrics() 
+    final_report.metrics = metricsNPL.get_metrics() + '\n' + metricsML.get_metrics()
     final_report.print_report()
     
     print("Generando informe...")
