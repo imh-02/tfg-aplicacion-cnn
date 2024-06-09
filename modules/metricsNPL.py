@@ -165,7 +165,6 @@ class MetricsNPL:
 
         result += "*CER: Character Error Rate \n"
         result += "*WER: Word Error Rate \n"
-        result += "*TER: Test Error Rate \n"
 
         result += "\n"
         return result
