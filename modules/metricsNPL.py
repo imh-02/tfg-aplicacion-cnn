@@ -57,17 +57,38 @@ class MetricsNPL:
                     dp[i][j] = dp[i - 1][j - 1]
                 else:
                     dp[i][j] = 1 + min(dp[i - 1][j],        # Eliminación
-                                    dp[i][j - 1],        # Inserción
-                                    dp[i - 1][j - 1])   # Sustitución
+                                       dp[i][j - 1],        # Inserción
+                                       dp[i - 1][j - 1])   # Sustitución
         
         # El valor en la esquina inferior derecha de la matriz es la distancia de edición
         edit_distance = dp[m][n]
-        insertions = max(n - m, 0)
-        deletions = max(m - n, 0)
+        
+        # Calculamos el número de sustituciones, inserciones y eliminaciones
+        i, j = m, n
+        substitutions, insertions, deletions = 0, 0, 0
+        while i > 0 and j > 0:
+            if ground_truth[i - 1] == predictions[j - 1]:
+                i -= 1
+                j -= 1
+            elif dp[i][j] == dp[i - 1][j - 1] + 1:
+                substitutions += 1
+                i -= 1
+                j -= 1
+            elif dp[i][j] == dp[i - 1][j] + 1:
+                deletions += 1
+                i -= 1
+            elif dp[i][j] == dp[i][j - 1] + 1:
+                insertions += 1
+                j -= 1
+        
+        # Las operaciones restantes
+        insertions += j
+        deletions += i
 
+        # tp, fp, fn considerando las sustituciones
         tp = m - edit_distance
-        fp = insertions
-        fn = deletions
+        fp = insertions + substitutions
+        fn = deletions + substitutions
 
         return tp, fp, fn
 

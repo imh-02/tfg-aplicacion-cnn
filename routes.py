@@ -19,5 +19,5 @@ reports_path_root = "reports\\"
 Rutas ficheros de entrada y salida
 """
 pdf_file_path = "ejemplos\\ejemplo1PS.pdf"
-output_file = "informe1PS-pruebaMetricasMLyNPL"
+output_file = "informe1PS-CNN"
 true_file_path = "datos_reales\\ejemplo1PS.txt"
