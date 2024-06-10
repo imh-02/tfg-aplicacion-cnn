@@ -167,6 +167,7 @@ class MetricsNPL:
         result = "Accuracy: " + str(round(accuracy, 2)) + "% \n" + "Precision: " + str(round(precision, 2)) + "% \n" + "Recall: " + str(round(recall, 2)) + "% \n" + "F1: " + str(round(f1, 2)) + "% \n" + "CER: " + str(round(cer_result, 2)) + "% \n" + "WER: " + str(round(wer_result, 2)) + "% \n" 
         return result
 
+
     def get_allMetricsParams(self, true_dnis, pred_dnis):
         total_tp = []
         total_fp = []
@@ -176,7 +177,7 @@ class MetricsNPL:
             total_tp.append(tp)
             total_fp.append(fp)
             total_fn.append(fn)
-        return total_tp, total_fp, total_fn
+        return sum(total_tp), sum(total_fp), sum(total_fn)
 
     """
     Método que devuelve las métricas a nivel de DNI obtenidas en el análisis en forma de cadena de texto.
@@ -186,17 +187,20 @@ class MetricsNPL:
         result += "\n"
         result += "Métricas antes del postprocesado: \n"
         result += "Parámetros de las métricas: \n"
-        result += self.get_allMetricsParams(self.y_true, self.dni_pred_before_postprocessing)
+        tp_before, fp_before, fn_before = self.get_allMetricsParams(self.y_true, self.dni_pred_before_postprocessing)
+        result += "TP: " + str(tp_before) + "\n" + "FP: " + str(fp_before) + " (inserciones + sustituciones)" + "\n" + "FN: " + str(fn_before) + " (eliminaciones)" + "\n"
         result += self.calculateBeforePostProcessingDNIMetrics()
         result += "\n"
         result += "Métricas tras eliminar caracteres especiales: \n"
         result += "Parámetros de las métricas: \n"
-        result += self.get_allMetricsParams(self.y_true, self.dni_pred_deleting_special_chars)
+        tp_special_char, fp_special_char, fn_special_char = self.get_allMetricsParams(self.y_true, self.dni_pred_deleting_special_chars)
+        result += "TP: " + str(tp_special_char) + "\n" + "FP: " + str(fp_special_char) + " (inserciones + sustituciones)" + "\n" + "FN: " + str(fn_special_char) + " (eliminaciones)" + "\n"
         result += self.calculateDeletingSpecialCharsDNIMetrics()
         result += "\n"
         result += "Métricas tras el postprocesado: \n"
         result += "Parámetros de las métricas: \n"
-        result += self.get_allMetricsParams(self.y_true, self.dni_pred_postprocessed)
+        tp_post, fp_post, fn_post = self.get_allMetricsParams(self.y_true, self.dni_pred_postprocessed)
+        result += "TP: " + str(tp_post) + "\n" + "FP: " + str(fp_post) + " (inserciones + sustituciones)" + "\n" + "FN: " + str(fn_post) + " (eliminaciones)" + "\n"
         result += self.calculatePostProccesingDNIMetrics()  
         result += "\n"
 
