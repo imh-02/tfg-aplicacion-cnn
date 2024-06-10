@@ -167,6 +167,16 @@ class MetricsNPL:
         result = "Accuracy: " + str(round(accuracy, 2)) + "% \n" + "Precision: " + str(round(precision, 2)) + "% \n" + "Recall: " + str(round(recall, 2)) + "% \n" + "F1: " + str(round(f1, 2)) + "% \n" + "CER: " + str(round(cer_result, 2)) + "% \n" + "WER: " + str(round(wer_result, 2)) + "% \n" 
         return result
 
+    def get_allMetricsParams(self, true_dnis, pred_dnis):
+        total_tp = []
+        total_fp = []
+        total_fn = []
+        for i in range(len(true_dnis)):
+            tp, fp, fn = self.get_metrics_params(true_dnis[i], pred_dnis[i])
+            total_tp.append(tp)
+            total_fp.append(fp)
+            total_fn.append(fn)
+        return total_tp, total_fp, total_fn
 
     """
     Método que devuelve las métricas a nivel de DNI obtenidas en el análisis en forma de cadena de texto.
@@ -175,12 +185,18 @@ class MetricsNPL:
         result = "Métricas desde el punto de vista de un problema NPL (OCR): \n"
         result += "\n"
         result += "Métricas antes del postprocesado: \n"
+        result += "Parámetros de las métricas: \n"
+        result += self.get_allMetricsParams(self.y_true, self.dni_pred_before_postprocessing)
         result += self.calculateBeforePostProcessingDNIMetrics()
         result += "\n"
         result += "Métricas tras eliminar caracteres especiales: \n"
+        result += "Parámetros de las métricas: \n"
+        result += self.get_allMetricsParams(self.y_true, self.dni_pred_deleting_special_chars)
         result += self.calculateDeletingSpecialCharsDNIMetrics()
         result += "\n"
         result += "Métricas tras el postprocesado: \n"
+        result += "Parámetros de las métricas: \n"
+        result += self.get_allMetricsParams(self.y_true, self.dni_pred_postprocessed)
         result += self.calculatePostProccesingDNIMetrics()  
         result += "\n"
 
