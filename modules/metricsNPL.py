@@ -88,7 +88,7 @@ class MetricsNPL:
         # tp, fp, fn considerando las sustituciones
         tp = m - edit_distance
         fp = insertions + substitutions
-        fn = deletions + substitutions
+        fn = deletions
 
         return tp, fp, fn
 
