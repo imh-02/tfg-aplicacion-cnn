@@ -1,11 +1,14 @@
 import torch
 from transformers import  AutoModel, AutoProcessor
-from routes import signature_model_path, cnn_letters_model_path, cnn_numbers_model_path
+from routes import signature_model_path, cnn_letters_model_path, cnn_numbers_model_path, device
 from modules.preprocess import preprocess_CNN
 import cv2
 import numpy as np
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+if device == True:
+    device = 'cuda'
+else:
+    device = 'cpu'
 
 """
 Carga de redes CNN para reconocimiento de caracteres individuales - 2 modelos separados

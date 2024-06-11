@@ -1,11 +1,11 @@
 import torch
 from transformers import TableTransformerForObjectDetection, DetrImageProcessor
-from routes import table_model_path
+from routes import table_model_path, device
 
-"""
-Verificación de la disponibilidad de la GPU para la ejecución de los modelos.
-"""
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+if device == True:
+    device = 'cuda'
+else:
+    device = 'cpu'
 print("Using device:", device)
 
 """

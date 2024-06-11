@@ -16,8 +16,13 @@ Ruta de la carpeta donde se guardarán los informes
 reports_path_root = "reports\\"
 
 """
+Flag para indicar si hay GPU disponible o no
+"""
+device = False
+
+"""
 Rutas ficheros de entrada y salida
 """
-pdf_file_path = "ejemplos\\ejemplo1000PS.pdf"
-output_file = "informe1000PS-CNN"
-true_file_path = "datos_reales\\ejemplo1000PS.txt"
+pdf_file_path = "ejemplos\\ejemplo1PS.pdf"
+output_file = "informe1PS-CNN-2"
+true_file_path = "datos_reales\\ejemplo1PS.txt"
