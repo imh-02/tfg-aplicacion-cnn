@@ -47,7 +47,7 @@ class MetricsML:
         fn = 0
         for i in range(len(pred_dnis)):
             if checkDNIFormat(pred_dnis[i]) == False:
-                if validSpanishDNI(true_dnis[i]):
+                if (checkDNIFormat(true_dnis[i]) and validSpanishDNI(true_dnis[i])):
                     fn += 1
         return fn
     
@@ -61,7 +61,7 @@ class MetricsML:
         tn = 0
         for i in range(len(pred_dnis)):
             if checkDNIFormat(pred_dnis[i]) == False:
-                if validSpanishDNI(true_dnis[i]) == False:
+                if ((checkDNIFormat(true_dnis[i]) == False) and (validSpanishDNI(true_dnis[i]) == False)):
                     tn += 1
         return tn
     
