@@ -17,6 +17,9 @@ reports_path_root = "reports\\"
 
 """
 Flag para indicar si hay GPU disponible o no
+
+False: CPU
+True: GPU
 """
 device = False
 
