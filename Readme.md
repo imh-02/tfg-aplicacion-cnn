@@ -1,9 +1,9 @@
-# Aplicación para la automatización de la verificación de recogida de firmas para proposiciones de Ley mediante Inteligencia Artificial - CNN
-
-**PENDIENTE DE ACTUALIZAR
+# Trabajo Fin de Grado - Aplicación para la automatización de la verificación de recogida de firmas para proposiciones de Ley mediante Inteligencia Artificial - CNN
 
 
 Ismael Martín Herrera *alu0101397375@ull.edu.es*
+
+Tutora: Elena Sánchez Nielsen *enielsen@ull.edu.es*
 
 ## Índice
 
@@ -56,7 +56,8 @@ Para el uso de la aplicación es necesario especificar en la variable ```reports
 
 - pdf_file_path: se corresponde con la ruta del fichero PDF de ejemplo con los datos de entrada, siguiendo la plantilla correspondiente. 
 - output_file: nombre que tendrá el informe final después del análisis. 
-- true_file_path: se corresponde con la ruta de datos reales en un fichero .txt para que se pueden realizar la métricas y ver el desempeño de la aplicación. 
+- true_file_path: se corresponde con la ruta de datos reales en un fichero .txt para que se pueden realizar la métricas y ver el desempeño de la aplicación.
+-  device: indica si se dispone de GPU NVIDIA o no.
 
 Una vez modificadas las variables ejecutar ```python main.py```
 

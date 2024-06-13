@@ -1,7 +1,9 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-    
+"""
+Clase con la arquitectura de la red neuronal convolucional para el modelo de clasificación de dígitos
+"""
 class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
@@ -21,7 +23,9 @@ class CNN(nn.Module):
 
         return F.softmax(x)
     
-
+"""
+Clase con la arquitectura de la red neuronal convolucional para el modelo de clasificación de letras
+"""
 class CNN_letters(nn.Module):
     def __init__(self):
         super(CNN_letters, self).__init__()

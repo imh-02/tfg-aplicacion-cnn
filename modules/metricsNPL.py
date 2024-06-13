@@ -217,17 +217,22 @@ class MetricsNPL:
         print(self.get_metrics())
 
     """
-    Método que añade una predicción a las métricas a nivel de DNI tras el postprocesado.
+    Método que añade una predicción a las métricas a NPL a nivel de caracteres antes del postprocesado.
+    
     """
-    def addPredictionPostProcessed(self, prediction):
-        self.dni_pred_postprocessed.append(str(prediction))
-
-
     def addPredictionBeforePostProcessed(self, prediction):
         self.dni_pred_before_postprocessing.append(str(prediction))
 
+    """
+    Método que añade una predicción a las métricas a NPL a nivel de caracteres después de eliminar caracteres especiales.
+    """
     def addPredictionDeletingSpecialChars(self, prediction):
         self.dni_pred_deleting_special_chars.append(str(prediction))
 
+    """
+    Método que añade una predicción a las métricas a NPL a nivel de caracteres después del postprocesado.
+    """
+    def addPredictionPostProcessed(self, prediction):
+        self.dni_pred_postprocessed.append(str(prediction))
 
 

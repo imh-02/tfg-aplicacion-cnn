@@ -87,7 +87,9 @@ class MetricsML:
         return tp / (tp + fp)
     
 
-    
+    """
+    Mide la proporción de DNIs correctamente reconocidos entre todos los DNIs que son correctos
+    """
     def recall(self, true_dnis, pred_dnis):
         tp = self.get_metricsTP(true_dnis, pred_dnis)
         fn = self.get_metricsFN(true_dnis, pred_dnis)
@@ -95,6 +97,9 @@ class MetricsML:
             return 0
         return tp / (tp + fn)
     
+    """
+    Mide la media armónica entre la precisión y la sensibilidad
+    """
     def f1(self, true_dnis, pred_dnis):
         precision = self.precision(true_dnis, pred_dnis)
         recall = self.recall(true_dnis, pred_dnis)
@@ -137,6 +142,10 @@ class MetricsML:
         result = "Métricas desde el punto de vista de un problema de clasificación de Machine Learning: \n"
         result += "\n"
         result += "Métricas antes del postprocesado: \n"
+
+        print("y_true: ", self.y_true)
+        print("dni_pred_before_postprocessing: ", self.dni_pred_before_postprocessing)
+
         result += "Parámetros de las métricas: \n"
         tp_before_postprocessing = self.get_metricsTP(self.y_true, self.dni_pred_before_postprocessing)
         fp_before_postprocessing = self.get_metricsFP(self.y_true, self.dni_pred_before_postprocessing)
@@ -146,6 +155,10 @@ class MetricsML:
         result += self.calculateBeforePostProcessingDNIMetrics()
         result += "\n"
         result += "Métricas tras eliminar caracteres especiales: \n"
+
+        print("y_true: ", self.y_true)
+        print("dni_pred_deleting_special_chars: ", self.dni_pred_deleting_special_chars)
+
         result += "Parámetros de las métricas: \n"
         tp_deleting_special_chars = self.get_metricsTP(self.y_true, self.dni_pred_deleting_special_chars)
         fp_deleting_special_chars = self.get_metricsFP(self.y_true, self.dni_pred_deleting_special_chars)
@@ -155,6 +168,10 @@ class MetricsML:
         result += self.calculateDeletingSpecialCharsDNIMetrics()
         result += "\n"
         result += "Métricas tras el postprocesado: \n"
+
+        print("y_true: ", self.y_true)
+        print("dni_pred_postprocessed: ", self.dni_pred_postprocessed)
+
         result += "Parámetros de las métricas: \n"
         tp_postprocessed = self.get_metricsTP(self.y_true, self.dni_pred_postprocessed)
         fp_postprocessed = self.get_metricsFP(self.y_true, self.dni_pred_postprocessed)
@@ -174,17 +191,21 @@ class MetricsML:
         print(self.get_metrics())
 
     """
+    Método que añade una predicción a las métricas a nivel de DNI antes del postprocesado.
+    """
+    def addPredictionBeforePostProcessed(self, prediction):
+        self.dni_pred_before_postprocessing.append(str(prediction))
+
+    """
+    Método que añade una predicción a las métricas a nivel de DNI tras eliminar caracteres especiales.
+    """
+    def addPredictionDeletingSpecialChars(self, prediction):
+        self.dni_pred_deleting_special_chars.append(str(prediction))
+
+    """
     Método que añade una predicción a las métricas a nivel de DNI tras el postprocesado.
     """
     def addPredictionPostProcessed(self, prediction):
         self.dni_pred_postprocessed.append(str(prediction))
-
-
-    def addPredictionBeforePostProcessed(self, prediction):
-        self.dni_pred_before_postprocessing.append(str(prediction))
-
-    def addPredictionDeletingSpecialChars(self, prediction):
-        self.dni_pred_deleting_special_chars.append(str(prediction))
-
 
 

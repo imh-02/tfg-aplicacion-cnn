@@ -23,6 +23,9 @@ def binarize_image(image, threshold):
     image_result = image.convert('RGB')
     return image_result
 
+"""
+Función para aplicar el preprocesado necesario a cada imagen antes de pasarlo a la red 
+"""
 def preprocess_CNN(image):
     heigth = image.size[1]
     width = image.size[0]
