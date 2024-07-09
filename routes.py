@@ -7,8 +7,8 @@ table_model_path = "models\\table-transformer-structure-recognition"
 """
 Ruta de las dos redes CNN 
 """
-cnn_letters_model_path = "models\\cnn_emnist_letters_tutorial70Epochs.pth"
-cnn_numbers_model_path = "models\\cnn_mnist_tutorial.pth"
+# cnn_letters_model_path = "models\\cnn_emnist_letters_tutorial70Epochs.pth"
+# cnn_numbers_model_path = "models\\cnn_mnist_tutorial.pth"
 crnn_complete_model_path = "models\\cnn_emnistCompleto_blank_60_epochs.pth"
 
 """
