@@ -23,24 +23,6 @@ def encode_label(label):
 
 def decode_label(encoded_label):
     return ''.join(label_encoder.inverse_transform(encoded_label))
-
-class OCRDataset(Dataset):
-    def __init__(self, image_paths, labels, transform=None):
-        self.image_paths = image_paths
-        self.labels = labels
-        self.transform = transform
-
-    def __len__(self):
-        return len(self.image_paths)
-
-    def __getitem__(self, idx):
-        image_path = self.image_paths[idx]
-        label = self.labels[idx]
-        image = Image.open(image_path).convert('L')  # Convert to grayscale
-        if self.transform:
-            image = self.transform(image)
-        label = encode_label(label)
-        return image, torch.tensor(label, dtype=torch.long)
     
 transform = transforms.Compose([
     transforms.Resize((32, 128)),  # Altura fija y ancho variable
@@ -49,23 +31,6 @@ transform = transforms.Compose([
 ])
 
 
-# images paths
-root_dir = 'datasets_generated\\datasetDNI'
-
-image_paths = []
-labels = []
-
-files = os.listdir(root_dir)
-
-for file in files:
-    if file.endswith('.png'):
-        image_paths.append(os.path.join(root_dir, file))
-        labels.append(file.split('.png')[0])
-
-print('Loading dataset...')
-
-dataset = OCRDataset(image_paths, labels, transform=transform)
-dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
 
 
 class BidirectionalLSTM(nn.Module):
@@ -129,32 +94,26 @@ class CRNN(nn.Module):
         output = self.rnn(conv)
         return output
 
-model = CRNN(imgH=32, nc=1, nclass=len(characters), nh=256)
-criterion = nn.CTCLoss(blank=blank_index, zero_infinity=True)
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+# cargar modelo 
+model = torch.load("cnn_emnistCompleto_blank_60_epochs.pth")
+model.eval()
 
-num_epochs = 10
+# cargar imagen
+with torch.no_grad():
+    image = Image.open("test3.png").convert('L')
+    image = transform(image).unsqueeze(0)
+    output = model(image)   
+    _, prediction = output.max(2)
+    prediction = prediction.transpose(1, 0).contiguous().view(-1)
 
-print('Start training')
+    # Eliminar predicciones repetidas y tokens "blank" (no eliminar '0' válidos)
+    decoded_prediction = []
+    for i in range(len(prediction)):
+        if i != 0 and prediction[i] == prediction[i-1]:
+            continue  # Ignorar predicciones repetidas
+        if prediction[i] != blank_index:  # Ignorar solo el token de "blank"
+            decoded_prediction.append(prediction[i].item())
 
-for epoch in range(num_epochs):
-    model.train()
-    epoch_loss = 0
-    for images, labels in dataloader:
-        optimizer.zero_grad()
-        outputs = model(images)
-        
-        # Transforma outputs y labels para CTC loss
-        input_lengths = torch.full(size=(outputs.size(1),), fill_value=outputs.size(0), dtype=torch.long)
-        target_lengths = torch.full(size=(labels.size(0),), fill_value=labels.size(1), dtype=torch.long)
+    predicted_text = decode_label(decoded_prediction)
+    print(f'Predicted Text: {predicted_text}')
 
-        loss = criterion(outputs.log_softmax(2), labels, input_lengths, target_lengths)
-        loss.backward()
-        optimizer.step()
-        
-        epoch_loss += loss.item()
-    
-    print(f'Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss/len(dataloader)}')
-
-
-torch.save(model, "cnn_emnistCompleto_blank.pth")

@@ -1,9 +1,12 @@
 import torch
 from transformers import  AutoModel, AutoProcessor
-from routes import signature_model_path, cnn_letters_model_path, cnn_numbers_model_path, device
+from routes import signature_model_path, cnn_letters_model_path, cnn_numbers_model_path, device, crnn_complete_model_path
 from modules.preprocess import preprocess_CNN
 import cv2
 import numpy as np
+from torchvision import transforms
+import string
+from sklearn.preprocessing import LabelEncoder
 
 if device == True:
     device = 'cuda'
@@ -15,6 +18,7 @@ Carga de redes CNN para reconocimiento de caracteres individuales - 2 modelos se
 """
 cnn_letter = torch.load(cnn_letters_model_path).to(device)
 cnn_number = torch.load(cnn_numbers_model_path).to(device)
+crnn_complete = torch.load(crnn_complete_model_path).to(device)
 
 """
 Carga del modelo preentrenado para la clasificación de imágenes de firma, desde el almacenamiento local.
@@ -53,6 +57,21 @@ letters_dict = {
         25: 'Y',
         26: 'Z'
         }
+
+characters = string.digits + string.ascii_uppercase  # '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+# añadir blank character _
+characters = characters + '_'
+blank_index = len(characters) - 1
+
+label_encoder = LabelEncoder()
+label_encoder.fit(list(characters))
+
+def encode_label(label):
+    return label_encoder.transform(list(label))
+
+def decode_label(encoded_label):
+    return ''.join(label_encoder.inverse_transform(encoded_label))
 
 
 """
@@ -195,16 +214,42 @@ def getDigit(image):
 Función encargada de extraer el DNI de una imagen, devolviendo el texto extraído.
 """
 def extractDNI(image):
-    image = image.crop((8,15, image.width-4, image.height-15))
-    cropped_characters = cropCharacters(image)
-    generated_text = ""
-    if len(cropped_characters) == 9 or len(cropped_characters) >= 10:
-        for i in range(0, 8):
-            generated_text += str(getDigit(cropped_characters[i]))
-        generated_text += getLetter(cropped_characters[8])
-    else:
-        for i in range(0, len(cropped_characters)):
-            generated_text += str(getDigit(cropped_characters[i]))
-    return generated_text
+    image = image.convert('L')
+    image = image.crop((10,18, image.width-5, image.height-15))
+    image = image.resize((128, 32))
+    transform = transforms.Compose([
+    transforms.Resize((32, 128)),  # Altura fija y ancho variable
+    transforms.ToTensor(),
+    transforms.Normalize((0.5,), (0.5,))
+    ])
+    crnn_complete.eval()
+    with torch.no_grad():
+        image = transform(image).unsqueeze(0)
+        output = crnn_complete(image)   
+        _, prediction = output.max(2)
+        prediction = prediction.transpose(1, 0).contiguous().view(-1)
+
+        # Eliminar predicciones repetidas y tokens "blank" (no eliminar '0' válidos)
+        decoded_prediction = []
+        for i in range(len(prediction)):
+            if i != 0 and prediction[i] == prediction[i-1]:
+                continue  # Ignorar predicciones repetidas
+            if prediction[i] != blank_index:  # Ignorar solo el token de "blank"
+                decoded_prediction.append(prediction[i].item())
+
+        predicted_text = decode_label(decoded_prediction)
+        return predicted_text
+
+    # image = image.crop((8,15, image.width-4, image.height-15))
+    # cropped_characters = cropCharacters(image)
+    # generated_text = ""
+    # if len(cropped_characters) == 9 or len(cropped_characters) >= 10:
+    #     for i in range(0, 8):
+    #         generated_text += str(getDigit(cropped_characters[i]))
+    #     generated_text += getLetter(cropped_characters[8])
+    # else:
+    #     for i in range(0, len(cropped_characters)):
+    #         generated_text += str(getDigit(cropped_characters[i]))
+    # return generated_text
 
             

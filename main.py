@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 import time
-from modules.cnn_model import CNN, CNN_letters
+from modules.cnn_model import CNN, CNN_letters, BidirectionalLSTM, CRNN
 
 from modules.preprocess import convert_page_to_image
 from modules.table_features import cell_detection
