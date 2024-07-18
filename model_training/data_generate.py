@@ -5,12 +5,12 @@ import os
 """
 Variables para especificar el número de imágenes que se van a generar
 """
-number_of_images = 450
+number_of_images = 20
 
 """
 Ruta donde se va a guardar el dataset generado
 """
-datasetPathRoot = "datasetDNI"
+datasetPathRoot = "datasetDNITransformations3"
 
 """
 Ruta del dataset origen de las imágenes de los dígitos y letras
@@ -36,6 +36,17 @@ def obteinRoutes(root):
 
 
 def generateDataset():
+    
+    print("¿Desea aplicar transformaciones a las imágenes? (S/N)")
+    applyTransformations = input()
+    transformationsFlag = False
+
+    if applyTransformations == "S" or applyTransformations == "s":
+        transformationsFlag = True
+        print("Se aplicarán transformaciones a las imágenes")
+    else :
+        print("No se aplicarán transformaciones a las imágenes")
+        
 
     if not os.path.exists(datasetPathRoot):
         os.makedirs(datasetPathRoot)
@@ -79,10 +90,37 @@ def generateDataset():
         letter = lettersPixels[randomLetterPosition]
         letter.shape = (28, 28)
         combined_array = np.hstack((generatedNumbers[0], generatedNumbers[1], generatedNumbers[2], generatedNumbers[3], 
-                                                  generatedNumbers[4], generatedNumbers[5], 
-                                                  generatedNumbers[6], generatedNumbers[7], 
-                                                  letter)).astype(np.uint8)
+                              generatedNumbers[4], generatedNumbers[5], 
+                              generatedNumbers[6], generatedNumbers[7], 
+                              letter)).astype(np.uint8)
+        
+        if transformationsFlag:
+            # Horizontal Alignment Left 1 Center 2 Right 3
+            horizontalAlignment = np.random.randint(1, 4)
+
+            if horizontalAlignment == 1:
+                combined_array = np.pad(combined_array, ((0, 0), (0, 28)), mode='constant', constant_values=255)
+            elif horizontalAlignment == 3:
+                combined_array = np.pad(combined_array, ((0, 0), (28, 0)), mode='constant', constant_values=255)
+            
+            # Vertical Alignment Top 1 Center 2 Bottom 3
+            verticalAlignment = np.random.randint(1, 4)
+
+            if verticalAlignment == 1:
+                combined_array = np.pad(combined_array, ((28, 0), (0, 0)), mode='constant', constant_values=255)
+            elif verticalAlignment == 3:
+                combined_array = np.pad(combined_array, ((0, 28), (0, 0)), mode='constant', constant_values=255)
+        
         resultDNIPil = Image.fromarray(combined_array)
+        
+        # Apply rotation to the image
+        if transformationsFlag:
+            angle = np.random.randint(-5, 5)
+            resultDNIPil = resultDNIPil.rotate(angle, resample=Image.BICUBIC, expand=True, fillcolor=255)
+
+        # ajustar el tamaño de la imagen a 252 x 28 manteniendo la relación de aspecto
+        resultDNIPil = resultDNIPil.resize((252, 28), Image.BICUBIC)
+
         resultDNIPil.save(datasetPathRoot + "\\" + resultDNIstring + ".png")
 
     return
